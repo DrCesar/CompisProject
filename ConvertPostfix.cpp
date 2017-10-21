@@ -102,6 +102,7 @@ void ConvertPostfix::signo(char s) {
 
 std::string ConvertPostfix::RegexConverter(std::string s) {
 
+    bool inString = false;
 
     int i = 0;
     this->regex = "";
@@ -110,7 +111,15 @@ std::string ConvertPostfix::RegexConverter(std::string s) {
 
         switch (s[i]) {
             case '{':
-
+                if (!inString) {
+                    regex = regex + "(";
+                }
+                break;
+            case '}':
+                if (!inString) {
+                    regex = regex + ")*";
+                }
+                break;
         }
     }
 

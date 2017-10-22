@@ -9,9 +9,15 @@ Production::Production(std::string& h) {
     this->head = h;
 }
 
-void Production::NewBoty(std::string &s) {
+Production::Production(std::string& h, bool b) {
 
-    Body* tempBody;
+    this->head = h;
+    this->terminal = b;
+}
+
+void Production::NewBody(std::string &s) {
+
+    Body* tempBody = new Body();
     Node* tempNode = new Node(s);
 
     tempBody->start = tempNode;

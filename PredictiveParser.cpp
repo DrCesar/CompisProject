@@ -10,17 +10,37 @@ PredictiveParser::PredictiveParser(std::map<std::string, Production *> p) {
     this->productions = p;
 }
 
-std::map<std::string,std::string> PredictiveParser::First(std::list<std::string> l) {
+std::map<std::string,std::string> PredictiveParser::First(std::vector<std::string> v) {
 
-    int counter = 0;
     std::map<std::string, std::string> ans, temp;
-    std::list<std::string>::const_iterator lIter = l.begin();
+    int i = 0;
+    temp["@"] = "@";
+    std::map<std::string, std::string>::iterator it = temp.find("@");
 
-    do {
-        temp = this->productions[*lIter]->GetFirst();
+    while (i < v.size() && it != temp.end()) {
+        temp = this->productions[v[i]]->GetFirst();
 
+        ans.insert(temp.begin(), temp.end());
+        if (i < v.size() - 1)
+            ans.erase("@");
 
+        it = temp.find("@");
+        i++;
+    };
 
-    } while (temp["@"] != nullptr);
+    return ans;
+}
+
+std::map<std::string, std::string> PredictiveParser::Follow(std::string s) {
+
+    std::map<std::string, std::string> ans;
+
+    for (auto const& x : this->productions) {
+//        for (auto const& y : x.second->GetBody()) {
+//            if (y->termsBody[s]. != nullptr)
+//
+//
+//        }
+    }
 }
 

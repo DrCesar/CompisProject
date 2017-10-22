@@ -6,6 +6,7 @@
 #define PROYECTOCOMPIS_PREDICTIVEPARSER_H
 
 #include "Production.h"
+#include <vector>
 
 class PredictiveParser {
 
@@ -16,7 +17,7 @@ private:
 public:
     PredictiveParser(std::map<std::string, Production*>);
 
-    std::map<std::string,std::string> First(std::list<std::string>);
+    std::map<std::string,std::string> First(std::vector<std::string>);
     std::map<std::string,std::string> Follow(std::string);
 
 

@@ -6,10 +6,12 @@
 #define PROYECTOCOMPIS_SYNTAXVALIDATOR_H
 
 #include <iostream>
+#include <fstream>
+#include "Production.h"
 
-class SyntaxValidator {
+class LexerScanner {
 
-public:
+private:
     std::string letterFormat = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     std::string digitFormat = "0123456789";
     std::string anyFormat = "{@N&}";
@@ -21,10 +23,22 @@ public:
     std::string attributesFormat = "<.{" + anyFormat + "}.>";
     std::string semactionFormat = "(.{" + anyFormat + "}.)";
 
+    std::ifstream file;
+    std::string currentLine;
+    int countCurrent;
+
+    std::map<std::string&, Production*> productions;
 
 
+public:
+    LexerScanner(std::string);
 
 
+    std::map<Production*, Production*> ProductionScanner();
+    Production* GetProduction();
+    std::string GetNextElement();
+    std::string GetNextLine();
+    std::string GetCurrentLine();
 };
 
 

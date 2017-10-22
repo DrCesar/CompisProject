@@ -7,9 +7,6 @@
 
 ConvertPostfix::ConvertPostfix(std::string s, bool op = false) {
 
-    if (op) {
-        s = RegexConverter(s);
-    }
 
     int i = 0;
 
@@ -26,7 +23,8 @@ ConvertPostfix::ConvertPostfix(std::string s, bool op = false) {
                 break;
             case ')':
                 while (!sOper.empty() && sOper.top() != '(') {
-                    sPostfix.push(sOper.top());
+                    char x = sOper.top();
+                    sPostfix.push(x);
                     sOper.pop();
                 }
                 if (!sOper.empty())
@@ -53,7 +51,8 @@ ConvertPostfix::ConvertPostfix(std::string s, bool op = false) {
         i++;
     }
     while (!sOper.empty()) {
-        sPostfix.push(sOper.top());
+        char x = sOper.top();
+        sPostfix.push(x);
         sOper.pop();
     }
 
@@ -69,7 +68,7 @@ int ConvertPostfix::jer(char c) {
 
     switch (c) {
         case '(':
-            return 4;
+            return 0;
         case '+':
         case '*':
             return 3;
@@ -86,7 +85,8 @@ int ConvertPostfix::jer(char c) {
 void ConvertPostfix::signo(char s) {
 
     while(!sOper.empty() && jer(sOper.top()) <= jer(s)) {
-        sPostfix.push(sOper.top());
+        char x = sOper.top();
+        sPostfix.push(x);
         sOper.pop();
     }
 
@@ -100,28 +100,121 @@ void ConvertPostfix::signo(char s) {
     }
 }
 
-std::string ConvertPostfix::RegexConverter(std::string s) {
+ConvertPostfix::ConvertPostfix(std::string s){
 
-    bool inString = false;
-
+    bool inStrChr = false;
     int i = 0;
+
+    this->imOp = false;
     this->regex = "";
 
     while (i < s.length()) {
 
+        if (inStrChr) {
+
+        }
+
         switch (s[i]) {
             case '{':
-                if (!inString) {
-                    regex = regex + "(";
+            case '(':
+                if (!inStrChr) {
+                    if (this->imOp)
+                        Sign('.');
+                    Sign('(');
                 }
                 break;
+            case ']':
+            case ')':
             case '}':
-                if (!inString) {
-                    regex = regex + ")*";
+                if (!inStrChr) {
+                    while (!this->op.empty() && op.top().info != '(') {
+                        Symbol x = op.top();
+                        temp.push(x);
+                        op.pop();
+                    }
+
+                    if (!op.empty())
+                        op.pop();
+
+                    if (s[i] == '}' || s[i] == ']')
+                        op.push(Symbol('*', true));
                 }
                 break;
+            case '.':
+            case '|':
+            case '*':
+            case '+':
+                if (!inStrChr)
+                    Sign(s[i]);
+                break;
+            case ' ':
+                break;
+            default:
+                if (imOp)
+                    Sign('.');
+
+
+
         }
     }
 
-    return nullptr;
 }
+
+int ConvertPostfix::Hierarchy(char c) {
+
+    switch (c) {
+        case '(':
+            return 0;
+        case '+':
+        case '*':
+            return 3;
+        case '.':
+            return 2;
+        case '|':
+            return 1;
+        default:
+            return 0;
+    }
+}
+
+void  ConvertPostfix::Sign(char c) {
+
+    while (!op.empty() && jer(c) <= jer(op.top().info)) {
+        Symbol x = op.top();
+        temp.push(x);
+        op.pop();
+    }
+
+    if (c == '*' || c == '+')
+        ts = true;
+    else
+        ts = false;
+
+    op.push(Symbol(c, true));
+}
+
+bool ConvertPostfix::StillInStrChr(std::string s, int i){
+
+    if (i < s.length())
+        return false;
+
+    switch (s[i]) {
+        case '{':
+        case '}':
+        case '[':
+        case ']':
+        case '(':
+        case ')':
+        case '+':
+        case '-':
+        case '.':
+        case '|':
+            return false;
+        case ' ':
+            return StillInStrChr(s, i + 1);
+        default:
+            return true;
+    }
+
+}
+

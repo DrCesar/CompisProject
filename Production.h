@@ -13,11 +13,17 @@ class Production {
     struct Node {
 
         std::string info;
+        Production* p;
         Node* next;
 
         Node(std::string& s) {
             info = s;
         }
+
+        Node(Production* x) {
+            p = x;
+        }
+
     };
 
     struct Body {
@@ -27,19 +33,32 @@ class Production {
         Node* end;
     };
 
+
+
+
 private:
     std::list<Body*> body;
     std::string head;
+    std::map<Production*, Production*> myProductions;
+    bool terminal;
 
 
 
 public:
     Production(std::string&);
+    Production(std::string&, bool);
+
+    std::list<Body*> GetBody() { return this->body; }
+    std::string GetHead() { return this->head; }
 
     void AddTermBody(std::string&);
-    void NewBoty(std::string&);
+    void NewBody(std::string&);
     std::map<std::string, std::string> GetFirst();
 
+    ~Production() {
+        for (auto const& x : this->body)
+            delete x;
+    }
 };
 
 

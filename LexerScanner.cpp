@@ -9,44 +9,60 @@ LexerScanner::LexerScanner(std::string s) {
 
     this->file.open(s);
 
-    while (this->currentLine.find("PRODUCTIONS") != std::string.npos)
+    while (this->currentLine.find("PRODUCTIONS") != std::string::npos)
         GetNextLine();
 
     ProductionScanner();
 
+}
+
+
+void LexerScanner::ProductionScanner() {
+
+
+    while (!file.eof())
+        CreateProduction();
+
     file.close();
+
+    for (auto const& p : this->productions)
+        p.second->Print();
 }
 
-
-std::map<Production*, Production*> LexerScanner::ProductionScanner() {
-
-    int counter = 0;
-
-
-
-
-}
-
-Production* LexerScanner::GetProduction() {
+void LexerScanner::CreateProduction() {
 
     GetNextLine();
+
 
     Production* p;
     Production* bodyElement;
     std::string head = GetNextElement();
     std::string element;
+    bool newBody = true;
 
-    if ((p = this->productions[head]) == nullptr)
-        p = new Production(head);
+    if ((p = this->productions[head]) == nullptr) {
+        p = new Production(head, false);
+        this->productions[head] = p;
+    } else
+        p->SetIsterminal(false);
 
     if (GetNextElement() == "=") {
-        while ((element = GetNextElement()) != "") {
+        while ((element = GetNextElement()) != ".") {
+            if (element == "|") {
+                element = GetNextElement();
+                newBody = true;
+            }
+
             if ((bodyElement = this->productions[element]) == nullptr)
-                bodyElement = new Production(element);
+                bodyElement = new Production(element, true);
 
             this->productions[element] = bodyElement;
+            if (newBody)
+                p->NewBody(bodyElement);
+            else
+                p->AddTermBody(bodyElement);
 
-
+            newBody = false;
         }
     } else {
         std::cout << "Error en linea" << std::endl;
@@ -65,6 +81,7 @@ std::string LexerScanner::GetNextElement() {
         this->countCurrent++;
     }
 
+    ;
     return ans;
 }
 
@@ -72,6 +89,8 @@ std::string LexerScanner::GetNextElement() {
 std::string LexerScanner::GetNextLine() {
 
     std::getline(this->file, this->currentLine);
+
+    this->countCurrent = 0;
 
     return this->currentLine;
 }

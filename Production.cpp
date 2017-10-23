@@ -4,48 +4,103 @@
 
 #include "Production.h"
 
-Production::Production(std::string& h) {
+Production::Production(std::string h) {
 
     this->head = h;
+    this->isTerminal = false;
 }
 
-Production::Production(std::string& h, bool b) {
+Production::Production(std::string h, bool b) {
 
     this->head = h;
-    this->terminal = b;
+    this->isTerminal = b;
 }
 
-void Production::NewBody(std::string &s) {
+void Production::NewBody(Production* p) {
 
     Body* tempBody = new Body();
-    Node* tempNode = new Node(s);
+    Node* tempNode = new Node(p);
 
     tempBody->start = tempNode;
-    this->body.push_back(tempBody);
-}
-
-void Production::AddTermBody(std::string& s) {
-
-    Body* tempBody = this->body.back();
-    Node* tempNode = new Node(s);
-
-    tempBody->end->next = tempNode;
     tempBody->end = tempNode;
+    this->body.push_back(tempBody);
 
-    tempBody->termsBody[s].push_back(tempNode);
+    p->AddBelongProduction(this);
 }
 
-std::map<std::string, std::string> Production::GetFirst() {
+void Production::AddTermBody(Production* p) {
 
-    std::map<std::string,std::string> ans;
+    if (this->body.back() != nullptr) {
+        Body *tempBody = this->body.back();
+        Node *tempNode = new Node(p);
 
-    for (Body* n : this->body) {
-        ans[n->start->info] = n->start->info;
-    }
+        tempBody->end->next = tempNode;
+        tempBody->end = tempNode;
+
+        tempBody->termsBody[p->GetHead()].push_back(tempNode);
+        p->AddBelongProduction(this);
+    } else
+        NewBody(p);
+}
+
+void Production::AddBelongProduction(Production* p) {
+
+    this->belongProductions[p] = p;
+}
+
+std::map<std::string, Production*> Production::GetFirst() {
+
+    std::map<std::string, Production*> ans, temp;
+
+    if (this->isTerminal)
+        ans[this->head] = this;
+    else
+        for (Body* n : this->body) {
+            if (n->start->p->GetIsTerminal())
+                ans[n->start->GetSymbol()] = n->start->p;
+            else {
+                temp = n->start->p->GetFirst();
+                ans.insert(temp.begin(), temp.end());
+            }
+        }
 
     return ans;
 }
 
+std::map<std::string, Production*> Production::GetFollow() {
 
+    std::map<std::string, Production*> ans, temp;
+
+    for (auto const& p : this->belongProductions) {
+        for (auto const &b : p.second->body)
+            for (auto const &n : b->termsBody[this->head]) {
+                if (n->next == nullptr) {
+                    if (p.second->GetHead() == this->GetHead())
+                        temp = this->GetFirst();
+                    else
+                        temp = p.second->GetFollow();
+                    ans.insert(temp.begin(), temp.end());
+                } else
+                    ans[n->next->GetSymbol()] = n->next->p;
+            }
+    }
+    return ans;
+}
+
+
+void Production::Print() {
+
+    for (auto const& b : this->body) {
+        std::cout << this->head << " = ";
+
+        Node* n = b->start;
+        while (n != nullptr) {
+            std::cout << n->GetSymbol() << " ";
+            n = n->next;
+        }
+
+        std::cout << std::endl;
+    }
+}
 
 

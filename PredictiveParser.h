@@ -17,8 +17,9 @@ private:
 public:
     PredictiveParser(std::map<std::string, Production*>);
 
-    std::map<std::string,std::string> First(std::vector<std::string>);
-    std::map<std::string,std::string> Follow(std::string);
+    std::map<std::string, Production*> First(Production*);
+    std::map<std::string, Production*> First(std::vector<std::string>);
+    std::map<std::string, Production*> Follow(std::string);
 
 
 };

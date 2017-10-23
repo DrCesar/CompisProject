@@ -7,21 +7,23 @@
 
 #include <map>
 #include <list>
+#include <vector>
+#include <iostream>
 
 class Production {
 
     struct Node {
 
-        std::string info;
         Production* p;
         Node* next;
 
-        Node(std::string& s) {
-            info = s;
-        }
-
         Node(Production* x) {
             p = x;
+            next = nullptr;
+        }
+
+        std::string GetSymbol() {
+            return this->p->GetHead();
         }
 
     };
@@ -39,26 +41,30 @@ class Production {
 private:
     std::list<Body*> body;
     std::string head;
-    std::map<Production*, Production*> myProductions;
-    bool terminal;
+    std::map<Production*, Production*> belongProductions;
+    bool isTerminal;
 
 
 
 public:
-    Production(std::string&);
-    Production(std::string&, bool);
+    Production(std::string);
+    Production(std::string, bool);
 
     std::list<Body*> GetBody() { return this->body; }
     std::string GetHead() { return this->head; }
+    bool GetIsTerminal() { return this->isTerminal; }
+    std::map<Production*, Production*> GetBelongBodys() { return this->belongProductions; }
 
-    void AddTermBody(std::string&);
-    void NewBody(std::string&);
-    std::map<std::string, std::string> GetFirst();
+    void SetIsterminal(bool b) { this->isTerminal = b; }
 
-    ~Production() {
-        for (auto const& x : this->body)
-            delete x;
-    }
+    void AddTermBody(Production*);
+    void NewBody(Production*);
+    void AddBelongProduction(Production*);
+
+    std::map<std::string, Production*> GetFirst();
+    std::map<std::string, Production*> GetFollow();
+
+    void Print();
 };
 
 

@@ -27,15 +27,16 @@ private:
     std::string currentLine;
     int countCurrent;
 
-    std::map<std::string&, Production*> productions;
+    std::map<std::string, Production*> productions;
 
 
 public:
     LexerScanner(std::string);
 
+    std::map<std::string, Production*> GetProductions() { return this->productions; }
 
-    std::map<Production*, Production*> ProductionScanner();
-    Production* GetProduction();
+    void ProductionScanner();
+    void CreateProduction();
     std::string GetNextElement();
     std::string GetNextLine();
     std::string GetCurrentLine();

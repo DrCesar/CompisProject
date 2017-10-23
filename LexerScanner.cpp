@@ -24,9 +24,6 @@ void LexerScanner::ProductionScanner() {
         CreateProduction();
 
     file.close();
-
-    for (auto const& p : this->productions)
-        p.second->Print();
 }
 
 void LexerScanner::CreateProduction() {

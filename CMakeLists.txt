@@ -3,5 +3,5 @@ project(ProyectoCompis)
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(SOURCE_FILES main.cpp ConvertPostfix.cpp ConvertPostfix.h SyntacticTree.cpp SyntacticTree.h Node.cpp Node.h Automaton.cpp Automaton.h DState.cpp DState.h LexerScanner.cpp LexerScanner.h PredictiveParser.cpp PredictiveParser.h Production.cpp Production.h)
+set(SOURCE_FILES main.cpp ConvertPostfix.cpp ConvertPostfix.h SyntacticTree.cpp SyntacticTree.h Node.cpp Node.h Automaton.cpp Automaton.h DState.cpp DState.h LexerScanner.cpp LexerScanner.h PredictiveParser.cpp PredictiveParser.h Production.cpp Production.h KernelItem.cpp KernelItem.h Symbol.cpp Symbol.h)
 add_executable(ProyectoCompis ${SOURCE_FILES})

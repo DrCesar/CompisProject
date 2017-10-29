@@ -11,6 +11,16 @@ DState::DState() {
     this->num = "";
 }
 
+DState::DState(Production* p) {
+
+    this->prodList[p] = p;
+}
+
+DState::DState(std::map<Production*, Production*> pl) {
+
+    this->prodList = pl;
+}
+
 DState::DState(std::map<Node*, Node*> l) {
 
     this->nodeList = l;
@@ -24,6 +34,11 @@ DState::DState(std::map<Node*, Node*> l) {
 void DState::AddTransition(DState* d, std::string s) {
 
     this->transition[s] = d;
+}
+
+void DState::AddTransitionS(DState *d, Symbol s) {
+
+    this->transitionS[s] = d;
 }
 
 bool DState::ContainsN(std::string n) {

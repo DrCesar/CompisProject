@@ -26,6 +26,9 @@ public:
     Automaton(SyntacticTree&);
 
     DState* GetStart(){ return this->start; }
+    std::map<DState*, DState*> GetStates() { return this->states; }
+
+    void SetAlfa(std::map<std::string, std::string> l) { this->alfa = l; }
 
     void AddEnd(DState* d){ this->end[d] = d; }
 

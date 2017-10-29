@@ -10,6 +10,64 @@ PredictiveParser::PredictiveParser(std::map<std::string, Production *> p) {
     this->productions = p;
 }
 
+void PredictiveParser::CreateAutomaton(){
+
+    struct DStateList {
+
+        static DState* GetMarked(std::map<DState*, DState*> l) {
+
+            for (auto const x: l) {
+                if (!x.second->GetMarked())
+                    return x.second;
+            }
+            return nullptr;
+        }
+
+        static bool AddTransition(DState* e, DState* marked, std::map<DState*, DState*>& l, Symbol s) {
+
+            for (const auto x : l){
+                if (x.second->GetProdList() == e->GetProdList()) {
+                    marked->AddTransitionS(x.second, s);
+                    return true;
+                }
+            }
+            return false;
+        }
+    };
+
+    std::map<Node*, Node*> temp;
+    DState* e;
+    DState* marked;
+    std::string s;
+    int cont = 0;
+
+    e = Closure(new DState(this->initial));
+    e->SetStart(true);
+    e->SetNum(std::to_string(++cont));
+    this->automat->GetStates()[e] = e;
+    this->start = e;
+
+    while ((marked = DStateList::GetMarked(this->automat->GetStates()))) {
+        marked->SetMarked(true);
+        for (auto const x : marked->GetProdList()) {
+            s = x.second;
+            temp = t.GetFolPos(marked->GetNodeList(), s);
+            e = new DState(temp);
+            if (!DStateList::AddTransition(e, marked, this->states, s)) {
+                e->SetNum(std::to_string(++cont));
+                this->automat->GetStates()[e] = e;
+                marked->AddTransition(e, s);
+            }
+        }
+    }
+
+    delete e;
+    delete marked;
+
+
+}
+
+
 std::map<std::string, Production*> PredictiveParser::First(Production* p) {
 
     std::vector<std::string> v;

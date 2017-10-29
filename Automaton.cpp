@@ -77,6 +77,7 @@ void Automaton::CreateAutomaton(SyntacticTree &t) {
 }
 
 
+
 std::map<DState*, DState*> Automaton::Move(std::map<DState *, DState *>& l, std::string& s) {
 
     std::map<DState*, DState*> res;

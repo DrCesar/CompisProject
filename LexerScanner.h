@@ -7,7 +7,9 @@
 
 #include <iostream>
 #include <fstream>
-#include "Production.h"
+#include <stack>
+#include "Parser/Production.h"
+#include "Parser/Symbol.h"
 
 class LexerScanner {
 
@@ -27,19 +29,28 @@ private:
     std::string currentLine;
     int countCurrent;
 
-    std::map<std::string, Production*> productions;
+    std::map<std::string, Symbol*> symbols;
+    std::map<Symbol*, std::list<Production*>> productions;
+    std::map<Symbol*, std::list<Production*>> belongProductions;
+    Production* initialP;
 
 
 public:
     LexerScanner(std::string);
 
-    std::map<std::string, Production*> GetProductions() { return this->productions; }
+    std::map<Symbol*, std::list<Production*>> GetProductions() { return this->productions; }
+    std::map<std::string, Symbol*> GetSymbols() { return this->symbols; };
+    std::map<Symbol*, std::list<Production*>> GetBelongProd() { return this->belongProductions; };
+
+    Production* GetInitialProduction() { return this->initialP; }
+    std::vector<Symbol*> LexeTokens(std::string);
 
     void ProductionScanner();
     void CreateProduction();
     std::string GetNextElement();
-    std::string GetNextLine();
+    std::string SetNextLine();
     std::string GetCurrentLine();
+    bool IsEndOfLine();
 };
 
 

@@ -7,11 +7,14 @@
 
 LexerScanner::LexerScanner(std::string s) {
 
+    this->initialP = nullptr;
     this->file.open(s);
+    SetNextLine();
 
-    while (this->currentLine.find("PRODUCTIONS") != std::string::npos)
-        GetNextLine();
+    while (this->currentLine.find("PRODUCTIONS") == std::string::npos)
+        SetNextLine();
 
+    SetNextLine();
     ProductionScanner();
 
 }
@@ -20,49 +23,81 @@ LexerScanner::LexerScanner(std::string s) {
 void LexerScanner::ProductionScanner() {
 
 
-    while (!file.eof())
+    while (!file.eof()) {
         CreateProduction();
+        SetNextLine();
+    }
 
     file.close();
 }
 
 void LexerScanner::CreateProduction() {
 
-    GetNextLine();
-
 
     Production* p;
-    Production* bodyElement;
+    Symbol* s;
+    Symbol* bodyElement;
     std::string head = GetNextElement();
     std::string element;
-    bool newBody = true;
+    bool newProduction = false;
+    bool EOL = false;
 
-    if ((p = this->productions[head]) == nullptr) {
-        p = new Production(head, false);
-        this->productions[head] = p;
-    } else
-        p->SetIsterminal(false);
+    if (head != "") {
 
-    if (GetNextElement() == "=") {
-        while ((element = GetNextElement()) != ".") {
-            if (element == "|") {
-                element = GetNextElement();
-                newBody = true;
+        if ((s = this->symbols[head]) == nullptr) {
+            s = new Symbol(head, false);
+            this->symbols[head] = s;
+        } else
+            s->SetTerminal(false);
+
+        p = new Production(s);
+        this->productions[s].push_back(p);
+
+        if (GetNextElement() == "=") {
+            while ((element = GetNextElement()) != "." && !EOL) {
+                if (element == "|") {
+                    element = GetNextElement();
+                    newProduction = true;
+                }
+
+                if ((bodyElement = this->symbols[element]) == nullptr) {
+                    bodyElement = new Symbol(element, true);
+                    this->symbols[element] = bodyElement;
+                }
+
+                //this->productions[element] = bodyElement;
+                if (newProduction) {
+                    p = new Production(s);
+                    this->productions[s].push_back(p);
+                }
+
+                p->AddTermBody(bodyElement);
+                this->belongProductions[bodyElement].push_back(p);
+
+                newProduction = false;
+                EOL = IsEndOfLine();
             }
 
-            if ((bodyElement = this->productions[element]) == nullptr)
-                bodyElement = new Production(element, true);
+            if (this->initialP == nullptr) {
+                Production *pTemp = new Production(new Symbol(p->GetHead()->GetInfo() + "'", false));
+                Symbol *end = new Symbol("$", true);
 
-            this->productions[element] = bodyElement;
-            if (newBody)
-                p->NewBody(bodyElement);
-            else
-                p->AddTermBody(bodyElement);
+                pTemp->AddTermBody(p->GetHead());
+                pTemp->AddTermBody(end);
 
-            newBody = false;
+                this->belongProductions[p->GetHead()].push_back(pTemp);
+                this->belongProductions[end].push_back(pTemp);
+
+                this->productions[pTemp->GetHead()].push_back(pTemp);
+
+                this->symbols[pTemp->GetHead()->GetInfo()] = pTemp->GetHead();
+                this->symbols[end->GetInfo()] = end;
+
+                this->initialP = pTemp;
+            }
+        } else {
+            std::cout << "Error en linea" << std::endl;
         }
-    } else {
-        std::cout << "Error en linea" << std::endl;
     }
 }
 
@@ -78,16 +113,47 @@ std::string LexerScanner::GetNextElement() {
         this->countCurrent++;
     }
 
-    ;
     return ans;
 }
 
 
-std::string LexerScanner::GetNextLine() {
+std::string LexerScanner::SetNextLine() {
 
     std::getline(this->file, this->currentLine);
 
     this->countCurrent = 0;
 
     return this->currentLine;
+}
+
+bool LexerScanner::IsEndOfLine() {
+    return this->countCurrent == this->currentLine.length();
+}
+
+std::vector<Symbol*> LexerScanner::LexeTokens(std::string input) {
+
+    std::string token = "";
+    std::string error = "";
+    std::vector<Symbol*> output;
+    int i = 0;
+
+    input = input + " $";
+
+    while (i < input.length() && error == "") {
+        token = "";
+        while (i < input.length() && input[i] != ' ') {
+            token = token + input[i];
+            i++;
+        }
+
+        if (this->symbols.find(token) != this->symbols.end()) {
+            output.push_back(this->symbols[token]);
+        } else {
+            error = "Ingreso un token inexistente";
+            std::cout << error << std::endl;
+        }
+        i++;
+    }
+
+    return output;
 }

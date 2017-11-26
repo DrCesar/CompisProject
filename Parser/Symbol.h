@@ -5,21 +5,24 @@
 #ifndef PROYECTOCOMPIS_SYMBOL_H
 #define PROYECTOCOMPIS_SYMBOL_H
 
-#include "iostream"
+#include <iostream>
+#include <map>
 
 class Symbol {
 
 private:
-    std::string sym;
+    std::string info;
     bool terminal;
 
 public:
     Symbol(std::string);
+    Symbol(std::string, bool);
 
-    std::string GetSymbol() { return this->sym; }
+    std::string GetInfo() { return this->info; }
     bool IsTerminal() {return this->terminal; }
+    void SetTerminal(bool b) { this->terminal = b; }
 
-    void setTerminal(bool b) { this->terminal = b; }
+    std::string ToString();
 };
 
 
